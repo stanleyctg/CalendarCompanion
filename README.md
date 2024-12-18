@@ -2,13 +2,18 @@
 
 ## Tech Stack:
   Frontend: React
+  
   Backend: Python, Django
+  
   Database: MySQL, Blockchain
 
 ## Tools and Technologies:
   APIs: Google Calendar, Wireshark
+  
   ML Models: Event Classification, Malware Detection (Malware/Benign)
+  
   Dataset: Kaggle (Malware Detection and Event Category datasets)
+  
   Hosting and ChatBot: AWS
 
 ## Features:
