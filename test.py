@@ -21,9 +21,4 @@ data = pd.DataFrame({
     'combined_text': ["Calling with my parents to talk about my day and time at university"]
 })
 
-tfidf_feature = vectorizer.transform(data['combined_text'])
-predicted = model.predict(tfidf_feature)
-
-print("Numeric Prediction:", predicted)
-predicted_category = [category_map[label] for label in predicted]
-print("Predicted Category:", predicted_category)
+print((vectorizer.toarray()))
