@@ -2,8 +2,6 @@ import streamlit as st
 import pickle
 import pandas as pd
 import os
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.naive_bayes import MultinomialNB
 
 MODEL_PATH = 'nb_model.pkl'
 VECTORIZER_PATH = 'vectorizer.pkl'
@@ -54,8 +52,6 @@ def update_model(model, vectorizer, text, correct_label):
     """
     X_new = vectorizer.transform([text])
     y_new = [correct_label]
-    # IMPORTANT: If you haven't called partial_fit before, 
-    # you may need to specify model.partial_fit(X_new, y_new, classes=[0,1,2,3,4,5]) the first time.
     model.partial_fit(X_new, y_new)
     save_model(model)
     append_feedback(text, correct_label)
@@ -83,7 +79,6 @@ def main():
             st.session_state["last_prediction"] = prediction
             st.session_state["last_input"] = user_input
 
-            # If model supports predict_proba
             if hasattr(model, "predict_proba"):
                 prediction_proba = model.predict_proba(X_input)[0]
                 confidence = max(prediction_proba)
@@ -91,7 +86,7 @@ def main():
             else:
                 st.session_state["last_confidence"] = None
 
-    # 3) SHOW RESULTS IF WE HAVE A PREDICTION
+    # 3) SHOW RESULTS FOR PREDICTION
     if "last_prediction" in st.session_state and "last_input" in st.session_state:
         # Retrieve from session_state
         prediction = st.session_state["last_prediction"]
@@ -128,9 +123,7 @@ def main():
                 # Optionally log the feedback as well
                 append_feedback(st.session_state["last_input"], prediction)
             else:
-                # "No, incorrect" path
                 if correct_category is not None:
-                    # Map the category name back to its label
                     correct_label_key = [k for k, v in category_map.items() if v == correct_category]
                     if correct_label_key:
                         correct_label_key = correct_label_key[0]
