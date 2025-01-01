@@ -98,7 +98,7 @@ def main():
         if confidence is not None:
             st.write(f"**Confidence:** {confidence:.2f}")
 
-        # 4) FEEDBACK SECTION (Always visible once we have a prediction)
+        # 4) FEEDBACK SECTION
         st.markdown("### Is this prediction correct?")
         feedback_choice = st.radio(
             "Select an option:",
@@ -106,7 +106,7 @@ def main():
             key="feedback_radio"
         )
 
-        # If user says "No, incorrect", show a selectbox for the correct category
+        # Iselect box for correct category
         if feedback_choice == "❌ No, incorrect":
             correct_category = st.selectbox(
                 "Select the correct category:",
@@ -120,7 +120,6 @@ def main():
         if st.button("Submit Feedback"):
             if feedback_choice == "✅ Yes, correct":
                 st.success("Thank you for confirming!")
-                # Optionally log the feedback as well
                 append_feedback(st.session_state["last_input"], prediction)
             else:
                 if correct_category is not None:
