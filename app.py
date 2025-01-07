@@ -2,6 +2,12 @@ import streamlit as st
 import pickle
 import pandas as pd
 import os
+import string
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import stopwords
+import nltk
+nltk.download('stopwords')
+nltk.download('wordnet')
 
 # Constants
 MODEL_PATH = 'nb_model.pkl'
@@ -53,9 +59,20 @@ class TextClassifierApp:
         feedback_entry = pd.DataFrame({'text': [text], 'correct_label': [correct_label]})
         feedback_entry.to_csv(self.feedback_file, mode='a', header=False, index=False)
 
+    def preprocess_text(self, text):
+        """Preprocess the input text before feeding it into the model."""
+        text = text.lower()
+        text = ''.join([char for char in text if char not in string.punctuation])
+        stop_words = set(stopwords.words('english'))
+        lemmatizer = WordNetLemmatizer()
+        words = text.split()
+        cleaned_words = [lemmatizer.lemmatize(word) for word in words if word not in stop_words]
+        return ' '.join(cleaned_words)
+
     def update_model(self, text, correct_label):
         """Update the model with new data using partial_fit."""
-        X_new = self.vectorizer.transform([text])
+        processed_text = self.preprocess_text(text)
+        X_new = self.vectorizer.transform([processed_text])
         y_new = [correct_label]
         self.model.partial_fit(X_new, y_new)
         self.save_model()
