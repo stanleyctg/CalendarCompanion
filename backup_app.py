@@ -2,12 +2,6 @@ import streamlit as st
 import pickle
 import pandas as pd
 import os
-import string
-from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords
-import nltk
-nltk.download('stopwords')
-nltk.download('wordnet')
 
 # Constants
 MODEL_PATH = 'nb_model.pkl'
@@ -59,16 +53,6 @@ class TextClassifierApp:
         feedback_entry = pd.DataFrame({'text': [text], 'correct_label': [correct_label]})
         feedback_entry.to_csv(self.feedback_file, mode='a', header=False, index=False)
 
-    def preprocess_text(self, text):
-        """Preprocess the input text before feeding it into the model."""
-        text = text.lower()
-        text = ''.join([char for char in text if char not in string.punctuation])
-        stop_words = set(stopwords.words('english'))
-        lemmatizer = WordNetLemmatizer()
-        words = text.split()
-        cleaned_words = [lemmatizer.lemmatize(word) for word in words if word not in stop_words]
-        return ' '.join(cleaned_words)
-
     def update_model(self, text, correct_label):
         """Update the model with new data using partial_fit."""
         X_new = self.vectorizer.transform([text])
@@ -98,14 +82,13 @@ class TextClassifierApp:
 
         # 1) TEXT INPUT
         user_input = st.text_area("Enter your text here:", height=150)
-        processed_input = self.preprocess_text(user_input)
 
         # 2) PREDICTION BUTTON
         if st.button("Predict"):
             if user_input.strip() == "":
                 st.warning("Please enter some text to classify.")
             else:
-                prediction, confidence = self.predict(processed_input)
+                prediction, confidence = self.predict(user_input)
                 st.session_state["last_prediction"] = prediction
                 st.session_state["last_input"] = user_input
                 st.session_state["last_confidence"] = confidence
@@ -140,13 +123,13 @@ class TextClassifierApp:
             if st.button("Submit Feedback"):
                 if feedback_choice == "✅ Yes, correct":
                     st.success("Thank you for confirming!")
-                    self.append_feedback(processed_input, prediction)
+                    self.append_feedback(st.session_state["last_input"], prediction)
                 else:
                     if correct_category is not None:
                         correct_label_key = [k for k, v in self.category_map.items() if v == correct_category]
                         if correct_label_key:
                             correct_label_key = correct_label_key[0]
-                            self.update_model(processed_input, correct_label_key)
+                            self.update_model(st.session_state["last_input"], correct_label_key)
                             st.success("Thank you! The model has been updated with your feedback.")
                         else:
                             st.error("Selected category is invalid.")
